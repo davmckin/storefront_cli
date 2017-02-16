@@ -1,6 +1,6 @@
-class Orders < ActiveRecord::Base
+class Order < ActiveRecord::Base
 
-belongs_to :users
-belongs_to :items
+belongs_to :user
+belongs_to :item
 
 end
