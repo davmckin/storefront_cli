@@ -3,6 +3,7 @@ require 'bundler/setup'
 require 'tty'
 require 'active_record'
 require 'sqlite3'
+require 'pry'
 require_relative 'models/address'
 require_relative 'models/item'
 require_relative 'models/order'
@@ -15,17 +16,16 @@ ActiveRecord::Base.establish_connection(
 puts User.count
 
 Item.order(price: :desc).limit(5).each do |o|
-  puts o.title
-  puts o.price
+  puts "#{o.title} costs #{o.price}"
 end
 
 Item.order(price: :asc).where(category: "Books").limit(1).each do |o|
-  puts o.title
+  puts "Cheapest book is #{o.title}"
 end
 
 Address.where(street: "6439 Zetta Hills").limit(1).each do |o|
 User.where(id: o[:user_id]).limit(1).each do |n|
-  puts n.first_name, n.last_name
+  puts "#{n.first_name} #{n.last_name} lives there."
 end
 end
 #or you can do it the MUCH SIMPLER WAY
@@ -52,8 +52,15 @@ Order.all.each do |o|
 end
 puts how_many.inject(:+)
 
-total = []
-Order.
-  total <<
-end
-puts total.inject(:+)
+most_ordered = Item.joins(:orders)
+                    .order("sum_order_quantity desc")
+                    .groups(:title)
+                    .sum("orders.quantity").first
+puts most_ordered
+
+#how much was spent on books
+
+books_total = Item.joins(:orders)
+                        .where("category LIKE '%books%'")
+                        .sum("price*quantity")
+puts "$#{books_total} was spent on books."
